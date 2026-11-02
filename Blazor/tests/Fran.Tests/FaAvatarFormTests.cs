@@ -188,4 +188,70 @@ public class FaAvatarFormTests : BunitContext
 
         Assert.DoesNotContain("fa-avatar-form-panel-open", panel.ClassName);
     }
+
+    [Fact]
+    public void RoundAvatarButton_RenderedByDefault_WhenNameHidden()
+    {
+        var cut = Render<FaAvatarForm>(p => p
+            .Add(x => x.IsAuthenticated, true)
+            .Add(x => x.DisplayName, "Jane Doe")
+            .Add(x => x.RoundAvatar, true)
+            .Add(x => x.ShowDisplayName, false));
+
+        var trigger = cut.Find("button.fa-avatar-form-trigger");
+        Assert.Contains("fa-avatar-form-trigger-round", trigger.ClassName);
+    }
+
+    [Fact]
+    public void OpeningPanel_RendersDragHandleAndBackdrop_ClickingBackdropCloses()
+    {
+        var cut = Render<FaAvatarForm>(p => p
+            .Add(x => x.IsAuthenticated, true)
+            .Add(x => x.DisplayName, "Jane Doe")
+            .Add(x => x.ShowBackdrop, true));
+
+        var trigger = cut.Find("button.fa-avatar-form-trigger");
+        trigger.Click();
+
+        var handle = cut.Find(".fa-avatar-form-drag-handle");
+        Assert.NotNull(handle);
+
+        var backdrop = cut.Find(".fa-avatar-form-backdrop");
+        Assert.NotNull(backdrop);
+
+        backdrop.Click();
+        var panel = cut.Find(".fa-avatar-form-panel");
+        Assert.DoesNotContain("fa-avatar-form-panel-open", panel.ClassName);
+    }
+
+    [Fact]
+    public void SettingsLink_Rendered_WhenConfigured()
+    {
+        var cut = Render<FaAvatarForm>(p => p
+            .Add(x => x.IsAuthenticated, true)
+            .Add(x => x.DisplayName, "Jane Doe")
+            .Add(x => x.SettingsHref, "/settings")
+            .Add(x => x.SettingsText, "All settings"));
+
+        var trigger = cut.Find("button.fa-avatar-form-trigger");
+        trigger.Click();
+
+        var settingsLink = cut.Find("a[href='/settings']");
+        Assert.NotNull(settingsLink);
+        Assert.Contains("All settings", settingsLink.TextContent);
+    }
+
+    [Fact]
+    public void FaAccountMenu_RendersRoundAvatarButton()
+    {
+        var cut = Render<FaAccountMenu>(p => p
+            .Add(x => x.IsAuthenticated, true)
+            .Add(x => x.DisplayName, "Benjamin Paresce")
+            .Add(x => x.RoundAvatar, true)
+            .Add(x => x.ShowDisplayName, false));
+
+        var trigger = cut.Find("button.fa-avatar-form-trigger");
+        Assert.NotNull(trigger);
+        Assert.Contains("fa-avatar-form-trigger-round", trigger.ClassName);
+    }
 }

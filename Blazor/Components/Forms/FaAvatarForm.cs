@@ -8,9 +8,11 @@ namespace Fran.Components;
 
 /// <summary>
 /// An avatar-triggered profile and session menu for app headers and topbars.
-/// In its collapsed resting state, it renders an avatar trigger (optionally accompanied
-/// by the user's name). When selected, it opens a contextual form/menu displaying the user's
-/// identity, a link/action to navigate to their account settings form, custom
+/// In its collapsed resting state, it renders a standard round avatar button (or optionally
+/// accompanied by the user's name). When selected, on desktop it opens a contextual modal
+/// anchored relative to the avatar button; on mobile, it docks at the bottom of the page
+/// as a touch-friendly bottom sheet. Inside the modal is the user's identity, an extensive
+/// settings link (for when settings exceed the modal's micro-interaction boundary), custom
 /// application-specific items, a Light/Dark/Colorblind theme switcher, and a Login or Logout action.
 /// </summary>
 public sealed class FaAvatarForm : ComponentBase
@@ -30,6 +32,33 @@ public sealed class FaAvatarForm : ComponentBase
     /// Defaults to false (only the avatar is displayed in the topbar).
     /// </summary>
     [Parameter] public bool ShowDisplayName { get; set; }
+
+    /// <summary>
+    /// Whether the resting trigger is a standalone round avatar button.
+    /// Defaults to true when <see cref="ShowDisplayName"/> is false.
+    /// </summary>
+    [Parameter] public bool RoundAvatar { get; set; } = true;
+
+    /// <summary>
+    /// Whether to render an interactive backdrop overlay when the modal/sheet is open.
+    /// Clicking the backdrop dismisses the menu. Defaults to true.
+    /// </summary>
+    [Parameter] public bool ShowBackdrop { get; set; } = true;
+
+    /// <summary>
+    /// Optional URL navigating to an extensive/full settings page when settings
+    /// exceed what fits in this micro-interaction modal.
+    /// </summary>
+    [Parameter] public string? SettingsHref { get; set; }
+
+    /// <summary>Label for the settings link/button. Defaults to "All settings".</summary>
+    [Parameter] public string SettingsText { get; set; } = "All settings";
+
+    /// <summary>Whether to show the settings link when configured. Defaults to true.</summary>
+    [Parameter] public bool ShowSettingsLink { get; set; } = true;
+
+    /// <summary>Callback invoked when the settings link/button is clicked.</summary>
+    [Parameter] public EventCallback OnSettingsClick { get; set; }
 
     /// <summary>
     /// Whether to render a subtle dropdown caret in the trigger.
@@ -99,6 +128,12 @@ public sealed class FaAvatarForm : ComponentBase
         _isOpen = !_isOpen;
     }
 
+    private void Close()
+    {
+        CancelPendingClose();
+        _isOpen = false;
+    }
+
     private void HandleFocusIn() => CancelPendingClose();
 
     private async Task HandleFocusOutAsync()
@@ -141,6 +176,15 @@ public sealed class FaAvatarForm : ComponentBase
         }
     }
 
+    private async Task HandleSettingsClickAsync()
+    {
+        _isOpen = false;
+        if (OnSettingsClick.HasDelegate)
+        {
+            await OnSettingsClick.InvokeAsync();
+        }
+    }
+
     private async Task HandleLoginAsync()
     {
         _isOpen = false;
@@ -156,6 +200,17 @@ public sealed class FaAvatarForm : ComponentBase
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
         var seq = 0;
+
+        // Interactive backdrop overlay
+        if (_isOpen && ShowBackdrop)
+        {
+            builder.OpenElement(seq++, "div");
+            builder.AddAttribute(seq++, "class", "fa-avatar-form-backdrop");
+            builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, Close));
+            builder.AddAttribute(seq++, "aria-hidden", "true");
+            builder.CloseElement();
+        }
+
         builder.OpenElement(seq++, "div");
         builder.AddAttribute(seq++, "id", _id);
         builder.AddAttribute(seq++, "class", CssClassNames.Combine("fa-avatar-form", CssClass));
@@ -163,10 +218,16 @@ public sealed class FaAvatarForm : ComponentBase
         builder.AddAttribute(seq++, "onfocusout", EventCallback.Factory.Create(this, HandleFocusOutAsync));
         builder.AddAttribute(seq++, "onkeydown", EventCallback.Factory.Create<KeyboardEventArgs>(this, HandleKeyDown));
 
-        // Trigger button
+        // Trigger button (round avatar button by default when name is not displayed)
+        var isRoundTrigger = RoundAvatar && !ShowDisplayName;
+        var triggerClass = CssClassNames.Combine(
+            "fa-avatar-form-trigger",
+            isRoundTrigger ? "fa-avatar-form-trigger-round" : null,
+            TriggerCssClass);
+
         builder.OpenElement(seq++, "button");
         builder.AddAttribute(seq++, "type", "button");
-        builder.AddAttribute(seq++, "class", CssClassNames.Combine("fa-avatar-form-trigger", TriggerCssClass));
+        builder.AddAttribute(seq++, "class", triggerClass);
         builder.AddAttribute(seq++, "aria-haspopup", "dialog");
         builder.AddAttribute(seq++, "aria-expanded", _isOpen ? "true" : "false");
         builder.AddAttribute(seq++, "aria-label", IsAuthenticated ? (!string.IsNullOrWhiteSpace(DisplayName) ? $"User menu for {DisplayName}" : "User menu") : "Account menu");
@@ -198,11 +259,17 @@ public sealed class FaAvatarForm : ComponentBase
 
         builder.CloseElement(); // button.fa-avatar-form-trigger
 
-        // Dropdown Panel
+        // Modal Panel (Relative on Desktop, Bottom Sheet on Mobile)
         builder.OpenElement(seq++, "div");
         builder.AddAttribute(seq++, "class", CssClassNames.Combine("fa-avatar-form-panel", AlignClass, _isOpen ? "fa-avatar-form-panel-open" : null));
         builder.AddAttribute(seq++, "role", "dialog");
         builder.AddAttribute(seq++, "aria-label", "User profile and settings");
+
+        // Mobile Drag/Grab Handle
+        builder.OpenElement(seq++, "div");
+        builder.AddAttribute(seq++, "class", "fa-avatar-form-drag-handle");
+        builder.AddAttribute(seq++, "aria-hidden", "true");
+        builder.CloseElement();
 
         // Identity Header
         builder.OpenElement(seq++, "div");
@@ -252,7 +319,7 @@ public sealed class FaAvatarForm : ComponentBase
                 builder.OpenElement(seq++, "a");
                 builder.AddAttribute(seq++, "href", AccountHref);
                 builder.AddAttribute(seq++, "class", "fa-avatar-form-account-action");
-                builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, () => _isOpen = false));
+                builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, Close));
 
                 builder.OpenComponent<FaIcon>(seq++);
                 builder.AddComponentParameter(seq++, nameof(FaIcon.Name), FaIconName.Settings);
@@ -294,6 +361,52 @@ public sealed class FaAvatarForm : ComponentBase
             builder.AddAttribute(seq++, "class", "fa-avatar-form-custom-section");
             builder.AddContent(seq++, ChildContent);
             builder.CloseElement();
+        }
+
+        // Settings Page Link (for when app settings exceed the micro-interaction boundary)
+        if (ShowSettingsLink && (!string.IsNullOrEmpty(SettingsHref) || OnSettingsClick.HasDelegate))
+        {
+            builder.OpenElement(seq++, "div");
+            builder.AddAttribute(seq++, "class", "fa-avatar-form-settings-section");
+
+            if (!string.IsNullOrEmpty(SettingsHref))
+            {
+                builder.OpenElement(seq++, "a");
+                builder.AddAttribute(seq++, "href", SettingsHref);
+                builder.AddAttribute(seq++, "class", "fa-avatar-form-item");
+                builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, Close));
+
+                builder.OpenComponent<FaIcon>(seq++);
+                builder.AddComponentParameter(seq++, nameof(FaIcon.Name), FaIconName.Settings);
+                builder.AddComponentParameter(seq++, nameof(FaIcon.Size), 14);
+                builder.CloseComponent();
+
+                builder.OpenElement(seq++, "span");
+                builder.AddContent(seq++, SettingsText);
+                builder.CloseElement();
+
+                builder.CloseElement(); // a.fa-avatar-form-item
+            }
+            else
+            {
+                builder.OpenElement(seq++, "button");
+                builder.AddAttribute(seq++, "type", "button");
+                builder.AddAttribute(seq++, "class", "fa-avatar-form-item");
+                builder.AddAttribute(seq++, "onclick", EventCallback.Factory.Create(this, HandleSettingsClickAsync));
+
+                builder.OpenComponent<FaIcon>(seq++);
+                builder.AddComponentParameter(seq++, nameof(FaIcon.Name), FaIconName.Settings);
+                builder.AddComponentParameter(seq++, nameof(FaIcon.Size), 14);
+                builder.CloseComponent();
+
+                builder.OpenElement(seq++, "span");
+                builder.AddContent(seq++, SettingsText);
+                builder.CloseElement();
+
+                builder.CloseElement(); // button.fa-avatar-form-item
+            }
+
+            builder.CloseElement(); // .fa-avatar-form-settings-section
         }
 
         // Theme Switcher Section

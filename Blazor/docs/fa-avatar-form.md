@@ -1,21 +1,27 @@
 [← Back to index](index.md)
 
-# FaAvatarForm
+# FaAvatarForm & FaAccountMenu
 
-An avatar-triggered profile and session menu designed for app headers and topbars.
+An avatar-triggered profile, settings, and session menu designed for app headers and topbars across all Paresce applications.
 
-In its resting state, `FaAvatarForm` renders a clean avatar trigger. You can configure whether the user's name appears alongside the avatar in the topbar or whether only the avatar is shown.
+In its resting state, `FaAvatarForm` (and its alias `<FaAccountMenu>`) renders a standard round avatar button (`fa-avatar-form-trigger-round`). You can configure whether the user's name appears alongside the avatar in the topbar or whether only the circular avatar button is shown.
 
-When the user selects their avatar, it opens a contextual panel containing:
+When the user selects their avatar:
+- **On Desktop**: It opens a contextual modal anchored **relative to the round avatar button** with an upward pointer notch.
+- **On Mobile (`<= 768px`)**: It displays docked at the **bottom of the page as a touch-friendly bottom sheet** with a swipe/drag handle and backdrop overlay.
+- **Micro-Interaction vs. Full Page**: Compact settings and theme toggles are handled in-place. If an app's settings exceed this micro-interaction boundary, a prominent link directs the user to a dedicated full page (`/settings` or `/account`), adhering to the Paresce Glanceable Focus Standard.
+
+Inside the opened modal/sheet:
 - **User Identity**: Avatar photo or initials, display name, and email or role subtitle.
-- **Account Navigation**: A direct action/link to navigate to the user's account form to update their picture and information.
+- **Account Navigation**: A direct action/link to navigate to the user's account form (`AccountHref`).
+- **Extensive Settings Link**: An action/link to navigate to full settings (`SettingsHref`, e.g. `/settings`).
 - **Application Items**: A slot (`ChildContent`) for any host-application-specific information, navigation links, or actions.
 - **Theme Selection**: Built-in Light / Dark / Colorblind mode switcher.
 - **Login / Logout Action**: A prominent Log in or Log out action button.
 
 ## Usage
 
-### Topbar with only avatar (default)
+### Standard round avatar button (default)
 
 ```razor
 <FaAvatarForm IsAuthenticated="true"
@@ -23,7 +29,19 @@ When the user selects their avatar, it opens a contextual panel containing:
               ImageUrl="https://example.com/avatar.jpg"
               Email="jane@example.com"
               AccountHref="/account"
+              SettingsHref="/settings"
               OnLogout="HandleLogout" />
+```
+
+Or using the `<FaAccountMenu>` component:
+
+```razor
+<FaAccountMenu IsAuthenticated="true"
+               DisplayName="Benjamin Paresce"
+               Email="ben@paresce.com"
+               AccountHref="/account"
+               SettingsHref="/settings"
+               OnLogout="HandleLogout" />
 ```
 
 ### Topbar showing user name alongside avatar
@@ -43,39 +61,22 @@ Set `ShowDisplayName="true"` to display the user's name next to the avatar in th
 Provide custom items or info via `ChildContent`:
 
 ```razor
-<FaAvatarForm IsAuthenticated="true"
-              DisplayName="Jane Doe"
-              Email="jane@example.com"
-              AccountHref="/account"
-              OnLogout="HandleLogout">
+<FaAccountMenu IsAuthenticated="true"
+               DisplayName="Jane Doe"
+               Email="jane@example.com"
+               AccountHref="/account"
+               SettingsHref="/settings"
+               OnLogout="HandleLogout">
     <a class="fa-avatar-form-item" href="/billing">Billing & Plans</a>
     <a class="fa-avatar-form-item" href="/team">Team Settings</a>
-</FaAvatarForm>
+</FaAccountMenu>
 ```
 
 ### Unauthenticated state
 
 ```razor
-<FaAvatarForm IsAuthenticated="false"
-              OnLogin="NavigateToLogin" />
-```
-
-### In `FaHeader` / Shells
-
-`FaHeader`, `FaStandardShell`, and `FaSidebarShell` support `UseAvatarForm`:
-
-```razor
-<FaSidebarShell BrandText="My App"
-                IsAuthenticated="true"
-                UserDisplayName="Jane Doe"
-                UserImageUrl="https://example.com/avatar.jpg"
-                UserEmail="jane@example.com"
-                UseAvatarForm="true"
-                ShowUserNameInHeader="false"
-                AccountHref="/account"
-                OnLogout="HandleLogout">
-    ...
-</FaSidebarShell>
+<FaAccountMenu IsAuthenticated="false"
+               OnLogin="NavigateToLogin" />
 ```
 
 ## Parameters
@@ -84,10 +85,16 @@ Provide custom items or info via `ChildContent`:
 |---|---|---|---|
 | `IsAuthenticated` | `bool` | `false` | When true, renders user identity, account action, and Logout button; when false, renders Guest and Login button |
 | `DisplayName` | `string?` | `null` | User display name |
-| `ImageUrl` | `string?` | `null` | Photo URL for avatar |
+| `ImageUrl` | `string?` | `null` | Photo URL for avatar (falls back to user initials when omitted) |
 | `Email` | `string?` | `null` | Secondary text (email, role) displayed in the identity panel |
 | `Subtitle` | `string?` | `null` | Alternative secondary text if `Email` is not used |
-| `ShowDisplayName` | `bool` | `false` | When false, topbar only shows the avatar; when true, shows name alongside avatar |
+| `RoundAvatar` | `bool` | `true` | When true (and `ShowDisplayName` is false), renders a circular avatar button |
+| `ShowDisplayName` | `bool` | `false` | When false, topbar only shows the circular avatar; when true, shows name alongside avatar |
+| `ShowBackdrop` | `bool` | `true` | Renders an interactive backdrop overlay; clicking dismisses the panel |
+| `SettingsHref` | `string?` | `null` | URL navigating to a dedicated full settings page when settings exceed modal size |
+| `SettingsText` | `string` | `"All settings"` | Label for the settings page link |
+| `ShowSettingsLink` | `bool` | `true` | Whether to show the settings page link when configured |
+| `OnSettingsClick` | `EventCallback` | | Callback invoked when the settings link is clicked |
 | `ShowCaret` | `bool?` | `null` | Dropdown caret visibility; defaults to matching `ShowDisplayName` |
 | `ShowThemeSwitcher` | `bool` | `true` | Whether to display Light / Dark / Colorblind switcher in the menu |
 | `ThemeSectionTitle` | `string` | `"Theme"` | Title text above the theme switcher |
@@ -99,7 +106,7 @@ Provide custom items or info via `ChildContent`:
 | `OnLogout` | `EventCallback` | | Callback invoked on Logout click |
 | `LoginText` | `string` | `"Log in"` | Label for Login button |
 | `LogoutText` | `string` | `"Log out"` | Label for Logout button |
-| `ChildContent` | `RenderFragment?` | `null` | Application-specific items rendered inside the opened panel |
+| `ChildContent` | `RenderFragment?` | `null` | Application-specific items rendered inside the opened avatar form |
 | `MenuAlign` | `FaAlign` | `FaAlign.End` | `End` (right-aligned) or `Start` (left-aligned) |
 | `CssClass` | `string?` | `null` | Optional CSS class on the container |
 | `TriggerCssClass` | `string?` | `null` | Optional CSS class on the trigger button |
