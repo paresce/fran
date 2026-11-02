@@ -198,10 +198,8 @@
 
 @media (prefers-reduced-motion: reduce) {
     .fa-avatar-form-panel-open,
-    @media (max-width: 768px) {
-        .fa-avatar-form-panel {
-            animation: none;
-        }
+    .fa-avatar-form-panel {
+        animation: none;
     }
 }
 
