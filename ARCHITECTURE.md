@@ -98,3 +98,10 @@ shipped it (skipped if it already exists, never re-pointed) — the pinnable tar
 anything consuming that library as source instead of tracking `main`'s moving tip.
 Each library bumps/publishes its own `<Version>` independently — see that library's
 own `ARCHITECTURE.md` for its specific policy (e.g. [`Blazor/ARCHITECTURE.md`](Blazor/ARCHITECTURE.md)).
+
+## Package Distribution Lifecycle & Roadmap
+
+- **Active Development (Pre-v1.0.0)**:
+  While Fran is in active development and evolving rapidly, packages are published to the organization's GitHub Packages registry (https://nuget.pkg.github.com/paresce/index.json). Consuming workflows authenticate using a FRAN_PAT secret (GitHub Personal Access Token with ead:packages scope) to enable cross-repository package restoration across the Paresce ecosystem.
+- **Stable Release (v1.0.0+)**:
+  Once Fran reaches API stability and a production-ready v1.0.0 release, the release pipeline will publish the Fran package directly to the public **NuGet.org** registry (https://api.nuget.org/v3/index.json). At that milestone, consuming projects and external developers will restore Fran with zero authentication, no tokens, and no special feed configuration required.

@@ -20,8 +20,8 @@ markup — see `ARCHITECTURE.md` if you're contributing.
 Published to **GitHub Packages** (not NuGet.org, for now) under `parrescence`:
 
 ```bash
-dotnet nuget add source https://nuget.pkg.github.com/parrescence/index.json \
-  --name github-parrescence --username <your-github-username> \
+dotnet nuget add source https://nuget.pkg.github.com/paresce/index.json \
+  --name github-paresce --username <your-github-username> \
   --password <a GitHub PAT with read:packages>
 
 dotnet add package Fran
