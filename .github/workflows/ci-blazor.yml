@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
 
       - name: Check for Blazor changes
         uses: dorny/paths-filter@v3
@@ -36,7 +36,7 @@ jobs:
 
       - name: Setup .NET
         if: steps.changes.outputs.blazor == 'true'
-        uses: actions/setup-dotnet@v6
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
 
