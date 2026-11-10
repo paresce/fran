@@ -65,9 +65,15 @@ jobs:
       # Contents:read + Actions:write, the minimum that lets this call succeed.
       - name: Notify Fran-Showcase (Blazor changed on dev)
         if: github.event_name == 'push' && github.ref == 'refs/heads/dev' && steps.changes.outputs.blazor == 'true'
+        env:
+          DISPATCH_TOKEN: ${{ secrets.FRAN_SHOWCASE_DISPATCH_TOKEN }}
         run: |
-          curl -sf -X POST \
-            -H "Authorization: Bearer ${{ secrets.FRAN_SHOWCASE_DISPATCH_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/parrescence/fran-showcase/dispatches \
-            -d '{"event_type":"blazor-updated"}'
+          if [ -n "$DISPATCH_TOKEN" ]; then
+            curl -sf -X POST \
+              -H "Authorization: Bearer $DISPATCH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/paresce/fran-showcase/dispatches \
+              -d '{"event_type":"blazor-updated"}' || echo "Showcase dispatch returned non-zero, continuing."
+          else
+            echo "FRAN_SHOWCASE_DISPATCH_TOKEN is not configured; skipping dispatch."
+          fi
