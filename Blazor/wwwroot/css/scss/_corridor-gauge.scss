@@ -1,0 +1,93 @@
+/* ============================= Corridor Gauge ============================= */
+.fa-corridor-gauge {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-family: inherit;
+    width: 100%;
+}
+
+.fa-corridor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.825rem;
+}
+
+.fa-corridor-label {
+    font-weight: 600;
+    color: var(--fa-text-main, #f8fafc);
+}
+
+.fa-corridor-badge {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--fa-radius-sm, 4px);
+    font-weight: 600;
+}
+
+.fa-corridor-badge-optimal {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.fa-corridor-badge-warning {
+    background: rgba(234, 179, 8, 0.15);
+    color: #facc15;
+    border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.fa-corridor-badge-alert {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.fa-corridor-track {
+    position: relative;
+    height: 10px;
+    background: var(--fa-surface-2, #1e293b);
+    border-radius: var(--fa-radius-sm, 4px);
+    overflow: visible;
+    display: flex;
+}
+
+.fa-corridor-segment {
+    height: 100%;
+}
+
+.fa-corridor-sub-optimal {
+    background: rgba(239, 68, 68, 0.25);
+    border-top-left-radius: var(--fa-radius-sm, 4px);
+    border-bottom-left-radius: var(--fa-radius-sm, 4px);
+}
+
+.fa-corridor-optimal {
+    background: rgba(34, 197, 94, 0.5);
+}
+
+.fa-corridor-excessive {
+    background: rgba(234, 179, 8, 0.35);
+    border-top-right-radius: var(--fa-radius-sm, 4px);
+    border-bottom-right-radius: var(--fa-radius-sm, 4px);
+}
+
+.fa-corridor-marker {
+    position: absolute;
+    top: -4px;
+    width: 3px;
+    height: 18px;
+    background: #ffffff;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8), 0 0 2px #000;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+.fa-corridor-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.725rem;
+    color: var(--fa-text-muted, #94a3b8);
+}
