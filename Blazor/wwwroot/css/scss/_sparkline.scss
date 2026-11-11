@@ -1,0 +1,55 @@
+/* ============================= Sparkline ============================= */
+.fa-sparkline {
+    display: inline-block;
+    vertical-align: middle;
+    overflow: visible;
+    color: var(--fa-primary, #38bdf8);
+}
+
+.fa-sparkline-line {
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.fa-sparkline-area {
+    opacity: 0.85;
+}
+
+.fa-sparkline-bar {
+    fill: currentColor;
+    opacity: 0.85;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.fa-sparkline-bar:hover {
+    opacity: 1;
+}
+
+.fa-sparkline-point {
+    vector-effect: non-scaling-stroke;
+}
+
+.fa-sparkline-point-min {
+    fill: #ef4444;
+    stroke: var(--fa-surface-1, #0f172a);
+    stroke-width: 1;
+}
+
+.fa-sparkline-point-max {
+    fill: #22c55e;
+    stroke: var(--fa-surface-1, #0f172a);
+    stroke-width: 1;
+}
+
+.fa-sparkline-point-last {
+    fill: currentColor;
+    stroke: var(--fa-surface-1, #0f172a);
+    stroke-width: 1.5;
+}
+
+.fa-sparkline-empty {
+    stroke: var(--fa-border, #334155);
+    stroke-width: 1.5;
+}
