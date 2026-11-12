@@ -1,0 +1,89 @@
+/* ============================= Heatmap ============================= */
+.fa-heatmap-wrapper {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-family: inherit;
+}
+
+.fa-heatmap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fa-heatmap-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--fa-text-main, #f8fafc);
+}
+
+.fa-heatmap {
+    display: grid;
+    border-radius: var(--fa-radius-sm, 4px);
+    overflow: visible;
+}
+
+.fa-heatmap-cell {
+    border: none;
+    border-radius: 2px;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.1s ease-in-out, outline 0.1s ease-in-out;
+}
+
+.fa-heatmap-cell:hover,
+.fa-heatmap-cell:focus-visible {
+    transform: scale(1.15);
+    outline: 2px solid var(--fa-text-main, #ffffff);
+    z-index: 2;
+}
+
+/* Base empty cell */
+.fa-heatmap-level-0 {
+    background-color: var(--fa-surface-2, #1e293b);
+}
+
+/* Green Color Scale (Default) */
+.fa-heatmap-green .fa-heatmap-level-1 { background-color: #0e4429; }
+.fa-heatmap-green .fa-heatmap-level-2 { background-color: #006d32; }
+.fa-heatmap-green .fa-heatmap-level-3 { background-color: #26a641; }
+.fa-heatmap-green .fa-heatmap-level-4 { background-color: #39d353; }
+
+/* Blue Color Scale */
+.fa-heatmap-blue .fa-heatmap-level-1 { background-color: #0c4a6e; }
+.fa-heatmap-blue .fa-heatmap-level-2 { background-color: #0284c7; }
+.fa-heatmap-blue .fa-heatmap-level-3 { background-color: #38bdf8; }
+.fa-heatmap-blue .fa-heatmap-level-4 { background-color: #7dd3fc; }
+
+/* Amber Color Scale */
+.fa-heatmap-amber .fa-heatmap-level-1 { background-color: #713f12; }
+.fa-heatmap-amber .fa-heatmap-level-2 { background-color: #ca8a04; }
+.fa-heatmap-amber .fa-heatmap-level-3 { background-color: #facc15; }
+.fa-heatmap-amber .fa-heatmap-level-4 { background-color: #fef08a; }
+
+/* Rose Color Scale */
+.fa-heatmap-rose .fa-heatmap-level-1 { background-color: #881337; }
+.fa-heatmap-rose .fa-heatmap-level-2 { background-color: #e11d48; }
+.fa-heatmap-rose .fa-heatmap-level-3 { background-color: #fb7185; }
+.fa-heatmap-rose .fa-heatmap-level-4 { background-color: #fecdd3; }
+
+/* Purple Color Scale */
+.fa-heatmap-purple .fa-heatmap-level-1 { background-color: #581c87; }
+.fa-heatmap-purple .fa-heatmap-level-2 { background-color: #9333ea; }
+.fa-heatmap-purple .fa-heatmap-level-3 { background-color: #c084fc; }
+.fa-heatmap-purple .fa-heatmap-level-4 { background-color: #e9d5ff; }
+
+.fa-heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--fa-text-muted, #94a3b8);
+    justify-content: flex-end;
+}
+
+.fa-heatmap-legend-cells {
+    display: flex;
+    gap: 2px;
+}
